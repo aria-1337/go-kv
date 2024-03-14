@@ -3,25 +3,33 @@ package main
 import (
     "net"
     "fmt"
+    "encoding/json"
 )
 
-func handleConnection(conn net.Conn) {
+type command struct {
+    Type string `json:"type"`
+    Key string `json:"key"`
+    Value string `json:"value"`
+}
+
+type response struct {
+    Message string `json:"message"`
+    Value string `json:"value"`
+}
+
+func handleConnection(conn net.Conn, encoder *json.Encoder, decoder *json.Decoder) {
     defer conn.Close()
-    buf := make([]byte, 4096)
+    c := command{}
     for {
-        n, err := conn.Read(buf)
+        err := decoder.Decode(&c)
         if err != nil {
             fmt.Println(err)
             break
         }
-        str := string(buf[:n])
-        routeRequest(str)
+        fmt.Println(c.Type)
     }
 }
 
-func routeRequest(r string) {
-    fmt.Println(r)
-}
 
 func main() {
     ln, err := net.Listen("tcp", ":6379")
@@ -34,6 +42,9 @@ func main() {
         if err != nil {
             fmt.Println(err)
         }
-        go handleConnection(conn)
+
+        decoder := json.NewDecoder(conn)
+        encoder := json.NewEncoder(conn)
+        go handleConnection(conn, encoder, decoder)
     }
 }

@@ -4,7 +4,14 @@ package main
 import (
     "net"
     "fmt"
+    "encoding/json"
 )
+
+type command struct {
+    Type string `json:"type"`
+    Key string `json:"key"`
+    Value string `json:"value"`
+}
 
 func main() {
     fmt.Println("1) Testing TCP server is running properly")
@@ -13,6 +20,15 @@ func main() {
         fmt.Println("X Failed")
         return
     }
-    fmt.Println("+ Passed")
     defer conn.Close()
+    fmt.Println("+ Passed")
+
+    encoder := json.NewEncoder(conn)
+
+    str := &command{
+        Type: "echo",
+        Key: "",
+        Value: "test"}
+
+    encoder.Encode(str)
 }
