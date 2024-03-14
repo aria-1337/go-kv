@@ -12,9 +12,15 @@ func handleConnection(conn net.Conn) {
         n, err := conn.Read(buf)
         if err != nil {
             fmt.Println(err)
+            break
         }
-        conn.Write(buf[:n])
+        str := string(buf[:n])
+        routeRequest(str)
     }
+}
+
+func routeRequest(r string) {
+    fmt.Println(r)
 }
 
 func main() {
