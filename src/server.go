@@ -36,17 +36,39 @@ func handleConnection(conn net.Conn, encoder *json.Encoder, decoder *json.Decode
                 set(mem, encoder, c)
             case "get":
                 get(mem, encoder, c)
+            case "delete":
+                deleteKey(mem, encoder, c)
         }
     }
 }
 
 func set(mem map[string]string, encoder *json.Encoder, c command) {
-    mem[string(c.Key)] = string(c.Value)
-    encoder.Encode(response{ Message: "OK", Value: "" })
+    existing, exists := mem[string(c.Key)]
+    if exists {
+        encoder.Encode(response{ Message: "ERROR EXISTS", Value: existing })
+    } else {
+        mem[c.Key] = string(c.Value)
+        encoder.Encode(response{ Message: "OK", Value: "" })
+    }
 }
 
 func get(mem map[string]string, encoder *json.Encoder, c command) {
-    encoder.Encode(response{ Message: "OK", Value: mem[string(c.Key)] })
+    existing, exists := mem[string(c.Key)]
+    if exists {
+        encoder.Encode(response{ Message: "OK", Value: existing })
+    } else {
+        encoder.Encode(response{ Message: "ERROR NOTFOUND", Value: "" })
+    }
+}
+
+func deleteKey(mem map[string]string, encoder *json.Encoder, c command) {
+    existing, exists := mem[string(c.Key)]
+    if exists {
+        delete(mem, string(c.Key))
+        encoder.Encode(response{ Message: "OK", Value: ""})
+    } else {
+        encoder.Encode(response{ Message: "ERROR EXISTS", Value: existing })
+    }
 }
 
 func main() {

@@ -77,6 +77,6 @@ func main() {
         fmt.Println("X Failed", getErr)
         os.Exit(1)
     }
-    fmt.Println(r.Value)
+    fmt.Println(r)
     fmt.Println("+ Passed")
 }
