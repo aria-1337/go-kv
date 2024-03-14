@@ -26,7 +26,10 @@ func handleConnection(conn net.Conn, encoder *json.Encoder, decoder *json.Decode
             fmt.Println(err)
             break
         }
-        fmt.Println(c.Type)
+        switch c.Type {
+            case "echo":
+                encoder.Encode(response{ Message: "OK", Value: "ECHO" })
+        }
     }
 }
 
