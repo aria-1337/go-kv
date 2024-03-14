@@ -16,7 +16,7 @@ type command struct {
 
 type response struct {
     Message string `json:"message"`
-    Value string `json:"value"`
+    Value interface{} `json:"value"`
 }
 
 func main() {
@@ -50,5 +50,33 @@ func main() {
         fmt.Println("X Failed. Given: ", r.Value, "expected: ECHO ", "Message: ", r.Message)
         os.Exit(1)
     }
+    fmt.Println("+ Passed")
+
+    fmt.Println("3) We can set a key and retrieve it")
+    key := command{
+        Type: "set",
+        Key: "test",
+        Value: "test data"}
+    encoder.Encode(key)
+
+    keyErr := decoder.Decode(&r)
+    if keyErr != nil {
+        fmt.Println("X Failed", keyErr)
+        os.Exit(1)
+    }
+
+    get := command{
+        Type: "get",
+        Key: "test",
+        Value: ""}
+
+    encoder.Encode(get)
+
+    getErr := decoder.Decode(&r)
+    if getErr != nil {
+        fmt.Println("X Failed", getErr)
+        os.Exit(1)
+    }
+    fmt.Println(r.Value)
     fmt.Println("+ Passed")
 }
